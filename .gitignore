@@ -112,3 +112,5 @@ gradle-app.setting
 ## OS Specific
 .DS_Store
 Thumbs.db
+/android/keystore.jks
+/android/keystore.properties

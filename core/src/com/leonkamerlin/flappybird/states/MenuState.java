@@ -23,13 +23,16 @@ public class MenuState extends State {
         mBackground = new Background();
         mGameCamera = gameCamera;
 
+
     }
 
     @Override
     public void handleInput(float dt) {
         if (Gdx.input.justTouched()) {
+            dispose();
             mGameStaticManager.set(new PlayState(mGameStaticManager, mGameCamera));
         }
+
     }
 
     @Override

@@ -1,6 +1,10 @@
+def keystorePropertiesFile = rootProject.file("android/keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
     buildToolsVersion "25.0.3"
-    compileSdkVersion 25
+    compileSdkVersion 26
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -20,7 +24,23 @@ android {
     defaultConfig {
         applicationId "com.leonkamerlin.flappybird"
         minSdkVersion 9
-        targetSdkVersion 25
+        targetSdkVersion 26
+    }
+
+
+    signingConfigs {
+        release {
+            storeFile rootProject.file('android/keystore.jks')
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
     }
 }
 

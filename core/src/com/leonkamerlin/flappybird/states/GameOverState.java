@@ -7,30 +7,31 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.leonkamerlin.flappybird.sprites.Background;
 import com.leonkamerlin.flappybird.sprites.Bird;
 import com.leonkamerlin.flappybird.sprites.BottomTube;
+import com.leonkamerlin.flappybird.sprites.GameOver;
 import com.leonkamerlin.flappybird.sprites.Ground;
 import com.leonkamerlin.flappybird.sprites.TopTube;
 import com.leonkamerlin.flappybird.sprites.Tube;
 import com.leonkamerlin.flappybird.utils.GameCamera;
 
 /**
- * Created by Leon on 6.6.2017..
+ * Created by Leon on 2.7.2017..
  */
 
-public class PlayState extends State {
+public class GameOverState extends State {
     private final Background[] mBackgrounds;
     private final GameCamera mGameCamera;
-    private final Sound mJumpSound;
-    private final BitmapFont mScoreCount;
-    private Bird mBird;
+    private final GameOver mGameOver;
+
+
     private Ground[] mGrounds;
     private Tube[] mTubes;
 
 
-    public PlayState(GameStateManager gsm, GameCamera gameCamera) {
+    public GameOverState(GameStateManager gsm, GameCamera gameCamera) {
         super(gsm);
-        mBird = new Bird();
+
         mBackgrounds = new Background[] {new Background(), new Background()};
-        mBird.getSprite().setPosition(mBird.getX(), mBird.getY());
+
         mGrounds = new Ground[]{new Ground(), new Ground(), new Ground()};
         mGameCamera = gameCamera;
         mTubes = new Tube[] {
@@ -42,22 +43,18 @@ public class PlayState extends State {
                 new Tube(new TopTube(), new BottomTube(), mGrounds[0]),
         };
 
-        mJumpSound = Gdx.audio.newSound(Gdx.files.internal("sfx_wing.ogg"));
+        mGameOver = new GameOver();
 
-        mScoreCount = new BitmapFont();
-        mScoreCount.getData().scale(2f);
+
     }
 
     @Override
     public void handleInput(float dt) {
         if (Gdx.input.justTouched()) {
 
+            dispose();
+            mGameStaticManager.set(new PlayState(mGameStaticManager, mGameCamera));
 
-
-            mBird.jump();
-            if (!mBird.isDied()) {
-                mJumpSound.play();
-            }
 
         }
     }
@@ -80,10 +77,11 @@ public class PlayState extends State {
             ground.getSprite().draw(sb);
         }
 
+        mGameOver.getSprite().draw(sb);
 
 
-        mBird.getSprite().draw(sb);
-        mScoreCount.draw(sb, String.valueOf(mBird.tubeCount(mTubes)), mGameCamera.getX() + 10, 650);
+
+
         sb.end();
 
     }
@@ -91,30 +89,10 @@ public class PlayState extends State {
     @Override
     public void update(float dt) {
         handleInput(dt);
-        mBird.freeFall(dt);
-        mGameCamera.getCamera().position.set(mBird.getX() + 80, mGameCamera.getCamera().viewportHeight / 2, 0);
+
         prepositionBackground();
         prepositionGrounds();
         prepositionTubes();
-
-
-
-        if (mBird.isCollidedWithGround(mGrounds[0])) {
-            mBird.setPosition(mBird.getX(), mGrounds[0].getTopY());
-        }
-        if(mBird.isCollidedWithTubes(mTubes)) {
-            Tube collidedTube = mBird.getLastCollidingTube();
-            if (collidedTube.getTopTube().isCollided()) {
-                mBird.setPosition(mBird.getX(), mBird.getY());
-            }
-
-        }
-
-
-        if (mBird.isDied()) {
-            dispose();
-            mGameStaticManager.set(new GameOverState(mGameStaticManager, mGameCamera));
-        }
 
 
 
@@ -137,9 +115,9 @@ public class PlayState extends State {
             ground.getSprite().getTexture().dispose();
         }
 
-        mJumpSound.dispose();
+        mGameOver.getSprite().getTexture().dispose();
 
-        mBird.getSprite().getTexture().dispose();
+
     }
 
 
@@ -155,8 +133,7 @@ public class PlayState extends State {
 
         mBackgrounds[1].setPosition(mBackgrounds[0].getRightX(), mBackgrounds[1].getY());
 
-        mBird.fill(50);
-        mBird.setToCenter();
+
         mGrounds[1].setPosition(mGrounds[0].getRightX(), mGrounds[1].getY());
         mGrounds[2].setPosition(mGrounds[1].getRightX(), mGrounds[1].getY());
 
@@ -167,6 +144,12 @@ public class PlayState extends State {
         mTubes[3].setX(mTubes[2].getRightX() + 150);
         mTubes[4].setX(mTubes[3].getRightX() + 150);
         mTubes[5].setX(mTubes[4].getRightX() + 150);
+
+
+        mGameOver.fillWidth(80f);
+
+        mGameOver.getSprite().setPosition(mGameOver.getSprite().getWidth() / 2, 677 / 2);
+
 
 
 
